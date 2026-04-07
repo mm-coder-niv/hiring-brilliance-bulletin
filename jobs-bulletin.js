@@ -47,7 +47,10 @@ Task:
       contents: [{ parts: [{ text: prompt }] }],
     }),
   });
-  if (!res.ok) throw new Error(`Gemini API error ${res.status}`);
+  if (!res.ok) {
+    const errBody = await res.text();
+    throw new Error(`Gemini API error ${res.status}: ${errBody}`);
+  }
   const data = await res.json();
   const raw  = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "[]";
   return JSON.parse(raw.replace(/```json|```/g, "").trim());
